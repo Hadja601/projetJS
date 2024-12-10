@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none; /* Commence caché */
+        }
+
+        .title {
+            text-align: center;
+            color: #3a3a3a;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .task-input {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        #taskInput {
+            width: 80%;
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #addButton {
+            width: 15%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #addButton:hover {
+            background-color: #45a049;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            font-size: 1rem;
+        }
+
+        li.completed {
+            text-decoration: line-through;
+            color: #aaa;
+        }
+
+        li input[type="checkbox"] {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .task-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        #clearButton {
+            width: 100%;
+            padding: 10px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        #clearButton:hover {
+            background-color: #e53935;
+        }
+        #showButton {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #showButton:hover {
+            background-color: #0b7dda;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bonjour Cliquez ici pour voir la suite  </h1>
+    <button id="showButton">Voir la To-Do List</button>
+
+    <div class="container">
+        
+        <h2 class="title">TO DO List</h2>
+        <div class="task-input">
+            <input type="text" id="taskInput" placeholder="Ajouter une tâche...">
+            <button id="addButton">Ajouter</button>
+        </div>
+        <ul id="taskList"></ul>
+        <div class="task-info">
+            <span id="taskCount">0 tâches</span>
+            <span id="completedCount">0 terminées</span>
+        </div>
+        <button id="clearButton">Tout supprimer</button>
+    </div>
+
+    <script>
+        const showButton = document.getElementById('showButton');
+        const taskInput = document.getElementById('taskInput');
+        const addButton = document.getElementById('addButton');
+        const taskList = document.getElementById('taskList');
+        const clearButton = document.getElementById('clearButton');
+        const taskCount = document.getElementById('taskCount');
+        const completedCount = document.getElementById('completedCount');
+        const container = document.querySelector('.container');
+        let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        function renderTasks() {
+            taskList.innerHTML = '';
+            let completed = 0;
+
+            tasks.forEach((task, index) => {
+                const li = document.createElement('li');
+                li.classList.toggle('completed', task.completed);
+
+                // Case à cocher pour marquer la tâche comme terminée
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = task.completed;
+                checkbox.addEventListener('click', () => toggleTask(index));
+
+                // Texte de la tâche
+                const text = document.createElement('span');
+                text.textContent = task.text;
+
+                li.appendChild(checkbox);
+                li.appendChild(text);
+                taskList.appendChild(li);
+
+                if (task.completed) completed++;
+            });
+
+            taskCount.textContent = `${tasks.length} tâche(s)`;
+            completedCount.textContent = `${completed} terminée(s)`;
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        // Fonction pour ajouter une tâche
+        addButton.addEventListener('click', () => {
+            const taskText = taskInput.value.trim();
+            if (taskText) {
+                tasks.push({ text: taskText, completed: false });
+                taskInput.value = '';
+                renderTasks();
+            }
+        });
+
+        // Fonction pour marquer une tâche comme terminée ou non
+        function toggleTask(index) {
+            tasks[index].completed = !tasks[index].completed;
+            renderTasks();
+        }
+
+        // Fonction pour vider toutes les tâches
+        clearButton.addEventListener('click', () => {
+            tasks = [];
+            renderTasks();
+        });
+
+        // Afficher ou masquer la To-Do List
+        showButton.addEventListener('click', () => {
+            container.style.display = 'block';  // Affiche la To-Do List
+            showButton.style.display = 'none';  // Cache le bouton "Voir la To-Do List"
+            renderTasks();
+        });
+
+        // Initialiser l'affichage des tâches (si elles existent déjà)
+        renderTasks();
+    </script>
+
+</body>
+</html>
